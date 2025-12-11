@@ -49,3 +49,29 @@ class MainWindow:
         # Настройка изменения размера окна
         self.root.minsize(400, 300)
         self.root.bind('<Configure>', self.on_window_resize)
+    
+    def bind_events(self):
+        """Привязка событий"""
+        self.controller.on_frame_update = self.update_video_frame
+        self.controller.on_status_update = self.update_status
+        
+    def update_video_frame(self, frame):
+        """Обновление отображаемого кадра"""
+        try:
+            if frame is not None:
+                # Конвертация numpy массива в ImageTk
+                from PIL import Image, ImageTk
+                img = Image.fromarray(frame)
+                
+                # Масштабирование под размер окна
+                label_width = self.video_label.winfo_width()
+                label_height = self.video_label.winfo_height()
+                
+                if label_width > 1 and label_height > 1:
+                    img = img.resize((label_width, label_height), Image.Resampling.LANCZOS)
+                
+                photo = ImageTk.PhotoImage(image=img)
+                self.video_label.configure(image=photo)
+                self.video_label.image = photo
+        except Exception as e:
+            print(f"Ошибка обновления кадра: {e}")
