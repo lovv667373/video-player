@@ -63,3 +63,42 @@ class VideoPlayer:
         except Exception as e:
             print(f"Ошибка получения кадра: {e}")
             return None
+        
+    def play(self):
+        """Начало воспроизведения"""
+        if self.cap is None:
+            return
+            
+        self.is_playing = True
+        self.is_paused = False
+        
+    def pause(self):
+        """Пауза воспроизведения"""
+        self.is_paused = True
+        
+    def stop(self):
+        """Остановка воспроизведения"""
+        self.is_playing = False
+        self.is_paused = False
+        self.current_frame_num = 0
+        if self.cap is not None:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    
+    def set_position(self, position):
+        """Установка позиции воспроизведения (0-100%)"""
+        if self.cap is None:
+            return
+            
+        frame_num = int((position / 100) * self.total_frames)
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
+        self.current_frame_num = frame_num
+    
+    def set_volume(self, volume):
+        """Установка громкости"""
+        self.volume = max(0, min(100, volume))
+    
+    def release(self):
+        """Освобождение ресурсов"""
+        if self.cap is not None:
+            self.cap.release()
+            self.cap = None
