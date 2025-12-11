@@ -42,3 +42,24 @@ class VideoPlayer:
         except Exception as e:
             print(f"Ошибка загрузки видео: {e}")
             return False
+    
+    def get_frame(self, frame_num=None):
+        """Получение кадра из видео"""
+        try:
+            if self.cap is None:
+                return None
+                
+            if frame_num is not None:
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
+                self.current_frame_num = frame_num
+                
+            ret, frame = self.cap.read()
+            if ret:
+                self.current_frame_num += 1
+                # Конвертация BGR (OpenCV) в RGB
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                return frame
+            return None
+        except Exception as e:
+            print(f"Ошибка получения кадра: {e}")
+            return None
