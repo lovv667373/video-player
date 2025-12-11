@@ -91,3 +91,50 @@ class MenuBar(Menu):
         self.controller = controller
         self.setup_menu()
 
+    def setup_menu(self):
+        """Настройка меню"""
+        # Меню Файл
+        file_menu = Menu(self, tearoff=0)
+        file_menu.add_command(label="Открыть", 
+                            command=self.controller.open_file,
+                            accelerator="Cmd+O")
+        file_menu.add_separator()
+        file_menu.add_command(label="Выход", 
+                            command=self.controller.quit_app,
+                            accelerator="Cmd+Q")
+        self.add_cascade(label="Файл", menu=file_menu)
+        
+        # Меню Видео
+        video_menu = Menu(self, tearoff=0)
+        video_menu.add_command(label="Воспроизвести/Пауза", 
+                             command=self.controller.toggle_play,
+                             accelerator="Space")
+        video_menu.add_command(label="Остановить", 
+                             command=self.controller.stop,
+                             accelerator="S")
+        self.add_cascade(label="Видео", menu=video_menu)
+        
+        # Меню Настройки
+        settings_menu = Menu(self, tearoff=0)
+        settings_menu.add_command(label="Размер окна...",
+                                command=self.controller.show_size_dialog)
+        self.add_cascade(label="Настройки", menu=settings_menu)
+        
+        # Меню Помощь
+        help_menu = Menu(self, tearoff=0)
+        help_menu.add_command(label="О программе",
+                            command=self.controller.show_about)
+        help_menu.add_command(label="Справка",
+                            command=self.controller.show_help)
+        self.add_cascade(label="Помощь", menu=help_menu)
+        
+        # Привязка горячих клавиш
+        self.controller.root.bind('<Command-o>', 
+                                lambda e: self.controller.open_file())
+        self.controller.root.bind('<Command-q>', 
+                                lambda e: self.controller.quit_app())
+        self.controller.root.bind('<space>', 
+                                lambda e: self.controller.toggle_play())
+        self.controller.root.bind('<s>', 
+                                lambda e: self.controller.stop())
+
