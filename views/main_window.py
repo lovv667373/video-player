@@ -75,3 +75,44 @@ class MainWindow:
                 self.video_label.image = photo
         except Exception as e:
             print(f"Ошибка обновления кадра: {e}")
+
+    def update_status(self, message):
+        """Обновление статусной строки"""
+        self.status_var.set(message)
+        
+    def on_window_resize(self, event):
+        """Обработчик изменения размера окна"""
+        if event.widget == self.root:
+            # Обновляем размер видео при изменении размера окна
+            if self.controller.is_playing:
+                # Можно добавить логику перерисовки
+                pass
+    
+    def open_file_dialog(self):
+        """Открытие диалога выбора файла"""
+        file_types = [
+            ("Видео файлы", "*.mp4 *.avi *.mov *.mkv *.flv *.wmv"),
+            ("Все файлы", "*.*")
+        ]
+        
+        file_path = filedialog.askopenfilename(
+            title="Выберите видеофайл",
+            filetypes=file_types
+        )
+        
+        if file_path:
+            self.controller.load_video(file_path)
+    
+    def show_about(self):
+        """Показ информации о программе"""
+        messagebox.showinfo(
+            "О программе",
+            "Видеоплеер v1.0\n\n"
+            "Лабораторная работа №3\n"
+            "Приложения с графическим интерфейсом\n\n"
+            "Возможности:\n"
+            "- Воспроизведение видеофайлов\n"
+            "- Управление воспроизведением\n"
+            "- Регулировка громкости\n"
+            "- Изменение размера окна"
+        )
