@@ -83,3 +83,11 @@ class ControlPanel(ttk.Frame):
         secs = int(seconds % 60)
         return f"{minutes:02d}:{secs:02d}"
 
+class MenuBar(Menu):
+    """Меню приложения"""
+    
+    def __init__(self, root, controller):
+        super().__init__(root)
+        self.controller = controller
+        self.setup_menu()
+
