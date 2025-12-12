@@ -1,3 +1,4 @@
+# controllers/player_controller.py
 """
 Контроллер видеоплеера
 """
@@ -5,13 +6,15 @@
 import threading
 import time
 from tkinter import messagebox, simpledialog
+from tkinter import simpledialog
 
 class PlayerController:
     """Контроллер для управления видеоплеером"""
-
+    
     def __init__(self, model):
         self.model = model
         self.view = None
+        self.root = None  # Ссылка на главное окно Tkinter
         self.is_playing = False
         self.playback_thread = None
         self.on_frame_update = None
@@ -36,7 +39,7 @@ class PlayerController:
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка загрузки: {str(e)}")
             return False
-        
+    
     def open_file(self):
         """Открытие файла через диалог"""
         if self.view:
@@ -67,6 +70,11 @@ class PlayerController:
         """Установка позиции воспроизведения"""
         try:
             self.model.set_position(float(position))
+            if self.view and hasattr(self.view, 'update_video_frame'):
+                # Показать кадр в новой позиции
+                frame = self.model.get_frame(self.model.current_frame_num)
+                if frame is not None:
+                    self.view.update_video_frame(frame)
         except Exception as e:
             print(f"Ошибка установки позиции: {e}")
     
@@ -88,18 +96,19 @@ class PlayerController:
         frame_delay = 1.0 / self.model.fps if self.model.fps > 0 else 0.033
         
         while True:
-            if self.is_playing and self.model.cap:
+            if self.is_playing and self.model.cap and not self.model.is_paused:
                 frame = self.model.get_frame()
                 if frame is not None:
                     if self.on_frame_update:
                         self.on_frame_update(frame)
                     
                     # Обновление времени
-                    current_time = self.model.current_frame_num / self.model.fps
-                    if self.view and self.view.control_panel:
-                        self.view.control_panel.update_progress(
-                            current_time, self.model.duration
-                        )
+                    if self.model.total_frames > 0:
+                        current_time = self.model.current_frame_num / self.model.fps
+                        if self.view and hasattr(self.view, 'control_panel'):
+                            self.view.control_panel.update_progress(
+                                current_time, self.model.duration
+                            )
                 
                 time.sleep(frame_delay)
             else:
@@ -107,7 +116,7 @@ class PlayerController:
     
     def show_size_dialog(self):
         """Показ диалога изменения размера окна"""
-        if not self.view:
+        if not self.root:
             return
             
         width = simpledialog.askinteger("Размер окна", 
@@ -120,7 +129,7 @@ class PlayerController:
                                         maxvalue=1080)
         
         if width and height:
-            self.view.root.geometry(f"{width}x{height}")
+            self.root.geometry(f"{width}x{height}")
     
     def show_about(self):
         """Показ информации о программе"""
@@ -150,8 +159,8 @@ class PlayerController:
     def quit_app(self):
         """Выход из приложения"""
         self.model.release()
-        if self.view:
-            self.view.root.quit()
+        if self.root:
+            self.root.quit()
     
     def update_status(self, message):
         """Обновление статуса"""

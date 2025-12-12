@@ -1,3 +1,4 @@
+# main.py
 #!/usr/bin/env python3
 """
 Главный файл приложения Video Player
@@ -15,15 +16,17 @@ def main():
         root = tk.Tk()
         root.title("Video Player")
         root.geometry("800x600")
-           
+        
         # Создаем модель
         player_model = VideoPlayer()
         
         # Создаем контроллер
         controller = PlayerController(player_model)
+        controller.root = root  # Передаем ссылку на главное окно
         
         # Создаем главное окно
         app = MainWindow(root, controller)
+        controller.set_view(app)  # Связываем контроллер с представлением
         
         # Запускаем главный цикл
         root.mainloop()
